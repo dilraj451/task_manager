@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}
+    New Task
+{% endblock %}
+
+{% block main %}
+<script>
+
+    function createNewElement() {
+    // First create a DIV element.
+	var txtNewInputBox = document.createElement('div');
+
+    // Then add the content (a new input box) of the element.
+    var str = "<input type='text' autocomplete='off' autofocus class='form-control mx-auto w-auto' placeholder='Collaborator' id='newInputBox' name='persons[]'>";
+	txtNewInputBox.innerHTML = str;
+
+    // Finally put it where it is supposed to appear.
+	document.getElementById("newElementId").appendChild(txtNewInputBox);
+    }
+
+</script>
+    <h1>
+        New Task
+    </h1>
+    <br>
+    <form action="/create" method="post">
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="task" name="task" placeholder="Task Name" type="text">
+        </div>
+        <br>
+        <div class="mb-3">
+            <label for="deadline">Deadline: </label>
+            <input type="datetime-local" id="deadline" name="deadline">
+        </div>
+        <br>
+        <div class="mb-3">
+            <button type="button" class="btn btn-secondary" onclick="createNewElement()">Add Collaborator</button>
+        </div>
+        <div id="newElementId"></div>
+        <br>
+        <button class="btn btn-primary" type="submit">Create</button>
+    </form>
+    <br>
+    <div>
+        {{ err_code }}
+    </div>
+{% endblock %}

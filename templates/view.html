@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Task Viewer
+{% endblock %}
+
+{% block main %}
+    <script>
+        // On click, reveals/conceals section beneath
+        function hideAndSeek(ID_block, ID_drop) {
+
+            var region = document.getElementById(ID_block);
+            var dropBase = document.getElementById(ID_drop).innerText;
+            dropBase = dropBase.substring(0, dropBase.length - 1);
+
+            // In case region is initially concealed
+            if (region.style.display == "none") {
+                region.style.display = "block";
+                document.getElementById(ID_drop).innerText = dropBase + '▲';
+            }
+
+            // In case region is initially viewable
+            else {
+                region.style.display = "none";
+                document.getElementById(ID_drop).innerText = dropBase + '▼';
+            }
+        }
+    </script>
+    <h1>
+        {{ data.task }}: Overview
+    </h1>
+    <br><br>
+    <!-- Back button -->
+    <form action="{{ url_for('back', task_id=data.id) }}" method="get">
+        <button type="submit" class="btn btn-secondary">Back</button>
+    </form>
+    <br><br><br>
+    <div>
+        <h2>
+            <!-- Header is also button to reveal/conceal contents below -->
+            <a class="drop_down" id="drop_keyDetails" href="javascript:;" onclick="hideAndSeek('keyDetails', 'drop_keyDetails')">Key Details ▲</a>
+        </h2>
+    </div>
+    <div id="keyDetails">
+        <!-- Details tabulated and presented -->
+        <table class="table table-dark table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Task</th>
+                    <th scope="col">Administrator</th>
+                    <th scope="col">Collaborators</th>
+                    <th scope="col">Deadline</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        {{ data.task }}
+                    </td>
+                    <td>{{ data.creator }}</td>
+                    <td>
+                        {% if data.collaborators != 0 %}
+                            {% for person in data.collaborators %}
+                                {{ person }}
+                                <br>
+                            {% endfor %}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ data.deadline }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    {% if admin == true %}
+        <div class="form-group tow flex-v-center">
+            <!-- Only administrator can edit/delete the task -->
+            {% if editable == true %}
+                <div class="col-xs-3">
+                    <form action="{{ url_for('edit_details', task_id=data.id) }}" method="get">
+                        <button type="submit" class="btn btn-warning">Edit Details</button>
+                    </form>
+                    <br>
+                </div>
+            {% endif %}
+            <div class="col-xs-3">
+                <form action="{{ url_for('delete_task', task_id=data.id) }}" method="get">
+                    <button type="submit" class="btn btn-danger">Delete Task</button>
+                </form>
+            </div>
+        </div>
+    {% else %}
+        <!-- If collaborator, user has option to opt out of task -->
+        <form action="{{ url_for('opt_out', task_id=data.id, user_id=user_id) }}" method="get">
+            <button type="submit" class="btn btn-danger">Opt Out</button>
+        </form>
+    {% endif %}
+    </div>
+    <br><br>
+    <h2>
+        <!-- Header is also reveal/conceal link for below content -->
+        <a class="drop_down" id="drop_files" href="javascript:;" onclick="hideAndSeek('files', 'drop_files')">Files ▲</a>
+    </h2>
+    <div id="files">
+        {% if editable == true %}
+            <!-- File uploads field and buttons -->
+            <form action="{{ url_for('upload', task_id=data.id) }}" method='post' enctype=multipart/form-data>
+                <div class="input-group mb-3">
+                    <input class="form-control form-inline" type='file' name='file'>
+                    <div class="input-group-append">
+                      <button class="btn btn-primary" type="submit">Upload</button>
+                    </div>
+                  </div>
+            </form>
+        {% endif %}
+        <br>
+        {% if meta != 0 %}
+            <!-- Any files uploaded displayed for viewing or deletion -->
+            <table class="table table-dark table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">File</th>
+                        <th scope="col">Created By</th>
+                        <th scope="col">Upload Date</th>
+                        {% if editable == true %}
+                            <th scope="col"></th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file in meta %}
+                        <tr>
+                            <td>
+                                <form action="{{ url_for('load_file', filename=file.filename, task_id=data.id) }}" method="get">
+                                    <button type="submit" class="btn btn-info">{{ file.filename }}</button>
+                                </form>
+                            </td>
+                            <td>{{ file.uploader }}</td>
+                            <td>{{ file.date }}</td>
+                            {% if editable == true %}
+                                <td>
+                                    <form action="{{ url_for('delete_file', filename=file.filename, task_id=data.id) }}" method="get">
+                                        <button type="submit" class="btn btn-danger">Delete File</button>
+                                    </form>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <br>
+            <div>
+                No files uploaded
+            </div>
+        {% endif %}
+    </div>
+    <br><br>
+    <h2>
+        <!-- Header doubles as revealer/concealer for below -->
+        <a class="drop_down" id="drop_messages" href="javascript:;" onclick="hideAndSeek('messages', 'drop_messages')">Messages ▲</a>
+    </h2>
+    <div id="messages">
+        {% if msgs != 0 %}
+            <!-- Messages displayed in chat area -->
+            <div class="speech">
+                {% for msg in msgs %}
+                    {% if msg.is_sender == true %}
+                        <div class="msg sent" data-time="Me {{ msg.date }}">{{ msg.content }}</div>
+                    {% else %}
+                        <div class="msg rcvd" data-time="{{ msg.sender }} {{ msg.date }}">{{ msg.content }}</div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% else %}
+                <div>
+                    No messages
+                </div>
+        {% endif %}
+        {% if editable == true %}
+            <br>
+            <!-- New message input form -->
+            <form action="{{ url_for('send_message', task_id=data.id) }}" method="post">
+                <div class="input-group mb-3">
+                    <input autocomplete="off" autofocus type="text" class="form-control" id="new_message" name="new_message" placeholder="Type new message">
+                    <div class="input-group-append">
+                      <button class="btn btn-primary" name="button" value="{{ data.id }}" type="submit">Send</button>
+                    </div>
+                  </div>
+            </form>
+        {% endif %}
+    </div>
+    <br><br><br>
+    <h2></h2>
+{% endblock %}

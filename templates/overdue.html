@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Overdue Tasks
+{% endblock %}
+
+{% block main %}
+    <div>
+        <h1>
+            Overdue
+        </h1>
+    </div>
+    <br>
+    <!-- Overdue assignments tabulated and output -->
+    {% if data != 0 %}
+        <div>
+            <table class="table table-danger table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Task</th>
+                        <th scope="col">Administrator</th>
+                        <th scope="col">Collaborators</th>
+                        <th scope="col">Deadline</th>
+                        <th scope="col"></th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                        <tr>
+                            <td>{{ row.task }}</td>
+                            <td>{{ row.creator }}</td>
+                            <td>
+                                <!-- Each collaborator output line-by-line -->
+                                {% if row.collaborators != 0 %}
+                                    {% for person in row.collaborators %}
+                                        {{ person }}
+                                        <br>
+                                    {% endfor %}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>{{ row.deadline }}</td>
+                            <td>
+                                <!-- View task button -->
+                                <form action="{{ url_for('view', task_id=row.id) }}" method="get">
+                                    <button type="submit" class="btn btn-info">View Details</button>
+                                </form>
+                            </td>
+                            <td>
+                                <!-- 'Set as complete' button -->
+                                <form action="{{ url_for('update', completed_id=row.id) }}" method="post">
+                                    <button type="submit" class="btn btn-success">Set As Complete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div>
+            None
+        </div>
+    {% endif %}
+{% endblock %}

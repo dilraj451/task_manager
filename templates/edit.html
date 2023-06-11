@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Edit Task
+{% endblock %}
+
+{% block main %}
+<script>
+
+    // Strings containing innerHTML for new input fields
+    const HTML_new_col = "<input type='text' autocomplete='off' autofocus class='form-control mx-auto w-auto' placeholder='Collaborator' id='newInputBox' name='new_persons[]'>";
+    const HTML_new_task = "<input type='text' autocomplete='off' autofocus class='form-control mx-auto w-auto' placeholder='New Task Description' id='newInputBox' name='new_task'>";
+    const HTML_new_deadline = "<label for='deadline'>New Deadline:&nbsp;</label><input type='datetime-local' id='new_deadline' name='new_deadline'>";
+
+    // Generates new (generic) input field
+    function createNewField(HTML_input, newFieldId) {
+        var newField = document.createElement('div');
+        newField.innerHTML = HTML_input;
+        document.getElementById(newFieldId).appendChild(newField);
+    }
+
+    // Creates new collaborator input field
+    function createNewCollaborator() {
+        createNewField(HTML_new_col, "newCollaboratorId")
+    }
+
+    // New task name field
+    function createNewTaskTitle() {
+        createNewField(HTML_new_task, "newTaskId")
+        document.getElementById("change_task_button").parentNode.removeChild(document.getElementById("change_task_button"));
+    }
+
+    // New deadline input field
+    function createNewDeadline() {
+        createNewField(HTML_new_deadline, "newDeadlineId")
+        document.getElementById("change_deadline_button").parentNode.removeChild(document.getElementById("change_deadline_button"));
+    }
+
+</script>
+    <form action="{{ url_for('edit_details', task_id=current.id) }}" method="post">
+        <div class="mb-3">
+            <label for="{{ current.task }}">Task Name:</label>
+            {{ current.task }}
+        </div>
+        <div class="mb-3" id="dynamicCheck">
+            <input type="button" id="change_task_button" value="Change Task Description" onclick="createNewTaskTitle();"/>
+        </div>
+        <div id="newTaskId"></div>
+        <br>
+        <div class="mb-3">
+            <label for="deadline">Deadline: </label>
+            {{ current.deadline }}
+        </div>
+        <div class="mb-3" id="dynamicCheck">
+            <input type="button" id="change_deadline_button" value="Change Deadline" onclick="createNewDeadline();"/>
+        </div>
+        <div id="newDeadlineId"></div>
+        <br>
+        {% if current.collaborators != 0 %}
+        <div>
+            Delete selected collaborators: <br><br>
+        </div>
+            {% for person in current.collaborators %}
+            <div>
+                <input type="checkbox" id="{{ person }}" name="del_collabs[]" value="{{ person }}">
+                <label for="{{ person }}">{{ person }}</label>
+            </div>
+            {% endfor %}
+            <br><br>
+        {% endif %}
+        <div class="mb-3" id="dynamicCheck">
+            <input type="button" value="Add Collaborator" onclick="createNewCollaborator();"/>
+        </div>
+        <div id="newCollaboratorId"></div>
+        <br>
+        <button class="btn btn-primary" type="submit" name="sub_butt" value="{{ current.id }}">Done</button>
+    </form>
+    <br>
+    <div>
+        {{ err_code }}
+    </div>
+{% endblock %}

@@ -1,0 +1,125 @@
+/* Size for brand */
+nav .navbar-brand
+{
+    font-size: xx-large;
+}
+
+
+h1 {
+  font-weight: normal;
+  margin-bottom: 0.5rem;
+}
+
+h2 {
+  border-top: 1px solid #e5e5ea;
+  color: #666;
+  font-weight: normal;
+  margin-top: 0;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+  text-align: left;
+}
+
+.comment {
+  color: #222;
+  font-size: 1.25rem;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+  max-width: 100%;
+  padding: 0;
+}
+
+.drop_down {
+  text-decoration: none;
+  color: #fff;
+}
+
+.view_button_back {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+
+
+/* Chat box size and fonts */
+* {margin: 0; box-sizing: border-box;}
+
+.speech {
+  --rad: 19px;
+  --rad-sm: 3px;
+  margin: auto;
+  font: 17px/1.6 serif;
+  padding: 10px;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.msg {
+  position: relative;
+  margin-bottom: 2.1px;
+  max-width: 70%;
+  padding: 7.1px 14.9px;
+}
+
+/* Message bubble shape and colour settings */
+
+.msg.rcvd {
+  border-radius: var(--rad) var(--rad-sm) var(--rad-sm) var(--rad-sm);
+  margin-right: auto;
+  color: White;
+  background: Green;
+}
+
+.msg.sent {
+  border-radius: var(--rad) var(--rad-sm) var(--rad-sm) var(--rad);
+  margin-left: auto;
+  color: White;
+  background: Magenta;
+}
+
+
+/* Control radius of blocks of messages */
+
+.msg.sent:first-child,
+.msg.rcvd+.msg.sent {
+  border-top-right-radius: var(--rad);
+}
+
+.msg.rcvd:first-child,
+.msg.sent+.msg.rcvd {
+  border-top-left-radius: var(--rad);
+}
+
+
+/* settings for meta data displayed above each message */
+
+.msg::before {
+  content: attr(data-time);
+  font-size: 0.9rem;
+  bottom: 100%;
+  position: absolute;
+  white-space: nowrap;
+  color: #899;
+  display: none;
+}
+
+
+.msg.rcvd::before {
+  left: 10px;
+}
+
+.msg.sent::before {
+  right: 10px;
+}
+
+
+
+/* No time shown for subsequent messages in block */
+
+.msg:first-child::before,
+.msg.rcvd+.msg.sent::before,
+.msg.sent+.msg.rcvd::before {
+  display: block;
+}
